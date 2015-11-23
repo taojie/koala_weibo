@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/accountactivity_new_light.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/refresh.png" charset="UTF-8" />
+  </component>
+</project>

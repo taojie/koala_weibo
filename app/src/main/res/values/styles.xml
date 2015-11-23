@@ -1,8 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <!--in order to get actionbar modify the patent -->
+    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+         <item name="add">@mipmap/accountactivity_new_light</item>
+         <item name="refresh">@mipmap/refresh</item>
     </style>
 
 </resources>

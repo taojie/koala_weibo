@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".accountActivity">
+    <item
+        android:id="@+id/add_account_menu"
+        android:icon="?attr/add"
+        android:title="@string/add_account"
+        app:showAsAction="ifRoom|withText" />
+</menu>
