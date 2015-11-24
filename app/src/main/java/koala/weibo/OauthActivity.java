@@ -2,6 +2,7 @@ package koala.weibo;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,13 +15,14 @@ import android.webkit.WebViewClient;
 import java.util.HashMap;
 
 import koala.weibo.dao.URLHepler;
+import koala.weibo.dao.login.OauthAccessTokenDao;
 import koala.weibo.support.utils.Utility;
 
 
 public class OauthActivity extends Activity {
 
     private WebView webView;
-
+    private String code;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,15 +49,15 @@ public class OauthActivity extends Activity {
         webView.loadUrl(getWeibooAuthUrl());
     }
 
-    public String getWeibooAuthUrl(){
-        HashMap<String,String> param = new HashMap<String,String>();
-        param.put("client_id","3745794535");
-        param.put("redirect_uri",URLHepler.DIRECT_URL);
-        param.put("display","mobile");
-        Log.e("koala",URLHepler.URL_OAUTH2_ACCESS_AUTHORIZE + "?" + Utility.encodeUrl(param));
+    public String getWeibooAuthUrl() {
+        HashMap<String, String> param = new HashMap<String, String>();
+        param.put("client_id", "3745794535");
+        param.put("redirect_uri", URLHepler.DIRECT_URL);
+        param.put("display", "mobile");
         return URLHepler.URL_OAUTH2_ACCESS_AUTHORIZE + "?" + Utility.encodeUrl(param);
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -74,8 +76,8 @@ public class OauthActivity extends Activity {
     private class WeiboWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            if(url.startsWith(URLHepler.DIRECT_URL)){
-                handleRedirectUrl(view,url);
+            if (url.startsWith(URLHepler.DIRECT_URL)) {
+                handleRedirectUrl(view, url);
             }
             super.onPageStarted(view, url, favicon);
         }
@@ -92,7 +94,21 @@ public class OauthActivity extends Activity {
         }
     }
 
-    public void handleRedirectUrl(WebView view,String url){
-       Log.e("koala",url);
+    public void handleRedirectUrl(WebView view, String url) {
+        Log.e("koala",url + "===========enrter handle");
+        Bundle values = Utility.parseUrl(url);
+        code= values.getString("code");
+        Log.e("koala", code + "============code");
+        new OAuthAccessTokenTask().execute(code);
     }
+
+    private static class OAuthAccessTokenTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+           new OauthAccessTokenDao(params[0]).login();
+            return null;
+        }
+    }
+
 }
