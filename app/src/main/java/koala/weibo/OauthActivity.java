@@ -14,15 +14,19 @@ import android.webkit.WebViewClient;
 
 import java.util.HashMap;
 
+import koala.weibo.bean.AccountBean;
+import koala.weibo.bean.UserBean;
 import koala.weibo.dao.URLHepler;
 import koala.weibo.dao.login.OauthAccessTokenDao;
+import koala.weibo.support.database.AccountDBTask;
 import koala.weibo.support.utils.Utility;
 
 
 public class OauthActivity extends Activity {
 
     private WebView webView;
-    private String code;
+    private String code = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,10 @@ public class OauthActivity extends Activity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             if (url.startsWith(URLHepler.DIRECT_URL)) {
+                if (!"".equals(code)) {
+                    finish();
+                    return;
+                }
                 handleRedirectUrl(view, url);
             }
             super.onPageStarted(view, url, favicon);
@@ -95,10 +103,8 @@ public class OauthActivity extends Activity {
     }
 
     public void handleRedirectUrl(WebView view, String url) {
-        Log.e("koala",url + "===========enrter handle");
         Bundle values = Utility.parseUrl(url);
-        code= values.getString("code");
-        Log.e("koala", code + "============code");
+        code = values.getString("code");
         new OAuthAccessTokenTask().execute(code);
     }
 
@@ -106,9 +112,14 @@ public class OauthActivity extends Activity {
 
         @Override
         protected Void doInBackground(String... params) {
-           new OauthAccessTokenDao(params[0]).login();
+            AccountBean account = new OauthAccessTokenDao(params[0]).login();
+            AccountDBTask.addOrUpdateAccount(account);
             return null;
         }
+    }
+
+    public enum DBTask{
+        ADD_SUCCESSFULLY,UPDATE_SUCCESSFULLY
     }
 
 }
