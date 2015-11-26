@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -63,13 +64,13 @@ public class AccountDBTask {
         Gson gson = new Gson();
         String userBean = gson.toJson(account.getUserBean());
         values.put(AccountTable.INFOJSON, userBean);
-
         Cursor cursor = getWsd().query(AccountTable.TABLE_NAME,null,AccountTable.UID + "=?",new String[]{account.getUserBean().getId()},null,null,null);
-
-        if(cursor != null && cursor.getColumnCount() > 0){
-             getWsd().update(AccountTable.TABLE_NAME,values, AccountTable.UID + "=?",new String[]{account.getUserBean().getId()});
+        if(cursor != null && cursor.getCount() > 0){
+            Log.e("koala", "update========");
+             getWsd().update(AccountTable.TABLE_NAME, values, AccountTable.UID + "=?", new String[]{account.getUserBean().getId()});
              return OauthActivity.DBTask.UPDATE_SUCCESSFULLY;
         }else{
+            Log.e("koala", "add========");
              getWsd().insert(AccountTable.TABLE_NAME,AccountTable.UID,values);
             return OauthActivity.DBTask.ADD_SUCCESSFULLY;
         }
