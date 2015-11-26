@@ -1,39 +1,41 @@
 package koala.weibo.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by taoxj on 15-11-25.
  */
-public class UserBean {
-    private String id;                    //用户UID
-    private String screen_name;           //用户昵称
-    private String name;                  //友好显示名称
-    private String province; 	              //用户所在省级ID
-    private String city; 	                  //用户所在城市ID
-    private String location; 	          //用户所在地
-    private String description; 	      //用户个人描述
-    private String url; 	              //用户博客地址
-    private String profile_image_url;     //用户头像地址（中图），50×50像素
-    private String profile_url; 	      //用户的微博统一URL地址
-    private String domain ;	              //用户的个性化域名
-    private String weihao ;	              //用户的微号
-    private String gender ;               //性别，m：男、f：女、n：未知
-    private String followers_count = "0" ;	      //粉丝数
-    private String friends_count = "0";	          //关注数
-    private String statuses_count = "0";	      //微博数
-    private String favourites_count = "0";        //收藏数
-    private String created_at ;	          //用户创建（注册）时间
-    private boolean allow_all_act_msg ;   //是否允许所有人给我发私信，true：是，false：否
-    private boolean geo_enabled ;	      //是否允许标识用户的地理位置，true：是，false：否
-    private boolean verified ;	          //是否是微博认证用户，即加V用户，true：是，false：否
-    private int verified_type ;	          //暂未支持
-    private String remark ;	              //用户备注信息，只有在查询用户关系时才返回此字段
-    private boolean allow_all_comment ;   //是否允许所有人对我的微博进行评论，true：是，false：否
-    private String avatar_large ;	      //用户头像地址（大图），180×180像素
-    private String  verified_reason ;     //认证原因
-    private boolean follow_me ;  	      //该用户是否关注当前登录用户，true：是，false：否
-    private String online_status ;	          //用户的在线状态，0：不在线、1：在线
-    private String bi_followers_count ;	  //用户的互粉数
-
+public class UserBean implements Parcelable {
+    private String id;
+    private String screen_name;
+    private String name;
+    private String province;
+    private String city;
+    private String location;
+    private String description;
+    private String url;
+    private String profile_image_url;
+    private String profile_url;
+    private String domain ;
+    private String weihao ;
+    private String gender ;
+    private String followers_count = "0" ;
+    private String friends_count = "0";
+    private String statuses_count = "0";
+    private String favourites_count = "0";
+    private String created_at ;
+    private boolean allow_all_act_msg ;
+    private boolean geo_enabled ;
+    private boolean verified ;
+    private int verified_type ;
+    private String remark ;
+    private boolean allow_all_comment ;
+    private String avatar_large ;
+    private String  verified_reason ;
+    private boolean follow_me ;
+    private String online_status ;
+    private String bi_followers_count ;
 
     public String getId() {
         return id;
@@ -265,5 +267,15 @@ public class UserBean {
 
     public void setBi_followers_count(String bi_followers_count) {
         this.bi_followers_count = bi_followers_count;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
     }
 }

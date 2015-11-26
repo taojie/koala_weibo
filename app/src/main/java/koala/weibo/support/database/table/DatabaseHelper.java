@@ -22,14 +22,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     static final String CREATE_ACCOUNT_TABLE_SQL = "create table " + AccountTable.TABLE_NAME
             + "("
-            + AccountTable.UID + " integer primary key"
-            + AccountTable.TOKEN + " text"
-            + AccountTable.EXPIRES_IN + " text"
+            + AccountTable.UID + " integer primary key,"
+            + AccountTable.TOKEN + " text,"
+            + AccountTable.EXPIRES_IN + " text,"
             + AccountTable.INFOJSON + " text"
             + ");";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.e("koala","on database create");
         db.execSQL(CREATE_ACCOUNT_TABLE_SQL);
     }
 
@@ -44,6 +45,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return dbHelper;
     }
-
 
 }

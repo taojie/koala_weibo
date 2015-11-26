@@ -1,4 +1,4 @@
-package koala.weibo;
+package koala.weibo.ui.login;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -8,12 +8,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.util.HashMap;
 
+import koala.weibo.R;
 import koala.weibo.bean.AccountBean;
 import koala.weibo.bean.UserBean;
 import koala.weibo.dao.URLHepler;
@@ -38,6 +41,12 @@ public class OauthActivity extends Activity {
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setSaveFormData(false);
+
+        CookieSyncManager.createInstance(this);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeAllCookie();
     }
 
     @Override
@@ -82,8 +91,7 @@ public class OauthActivity extends Activity {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             if (url.startsWith(URLHepler.DIRECT_URL)) {
                 if (!"".equals(code)) {
-                    finish();
-                    return;
+                    setResult(RESULT_OK);
                 }
                 handleRedirectUrl(view, url);
             }
@@ -108,13 +116,18 @@ public class OauthActivity extends Activity {
         new OAuthAccessTokenTask().execute(code);
     }
 
-    private static class OAuthAccessTokenTask extends AsyncTask<String, Void, Void> {
+    private static class OAuthAccessTokenTask extends AsyncTask<String, Void, DBTask> {
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected DBTask doInBackground(String... params) {
             AccountBean account = new OauthAccessTokenDao(params[0]).login();
-            AccountDBTask.addOrUpdateAccount(account);
-            return null;
+            DBTask result = AccountDBTask.addOrUpdateAccount(account);
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(DBTask dbTask) {
+
         }
     }
 
