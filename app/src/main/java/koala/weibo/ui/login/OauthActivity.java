@@ -14,6 +14,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 import koala.weibo.R;
@@ -28,8 +29,7 @@ import koala.weibo.support.utils.Utility;
 public class OauthActivity extends Activity {
 
     private WebView webView;
-    private String code = "";
-
+    private boolean flag = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,11 +89,14 @@ public class OauthActivity extends Activity {
     private class WeiboWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            Log.e("koala","url " + url);
             if (url.startsWith(URLHepler.DIRECT_URL)) {
-                if (!"".equals(code)) {
-                    setResult(RESULT_OK);
+                if (flag) {
+                    handleRedirectUrl(view, url);
+                    flag = false;
+                }else{
+                    view.stopLoading();
                 }
-                handleRedirectUrl(view, url);
             }
             super.onPageStarted(view, url, favicon);
         }
@@ -112,12 +115,16 @@ public class OauthActivity extends Activity {
 
     public void handleRedirectUrl(WebView view, String url) {
         Bundle values = Utility.parseUrl(url);
-        code = values.getString("code");
-        new OAuthAccessTokenTask().execute(code);
+        String code = values.getString("code");
+        new OAuthAccessTokenTask(this).execute(code);
     }
 
     private static class OAuthAccessTokenTask extends AsyncTask<String, Void, DBTask> {
 
+        private WeakReference<OauthActivity> weakActivity;
+        public OAuthAccessTokenTask(OauthActivity activity){
+            weakActivity = new WeakReference<OauthActivity>(activity);
+        }
         @Override
         protected DBTask doInBackground(String... params) {
             AccountBean account = new OauthAccessTokenDao(params[0]).login();
@@ -127,7 +134,9 @@ public class OauthActivity extends Activity {
 
         @Override
         protected void onPostExecute(DBTask dbTask) {
-
+            OauthActivity activity = weakActivity.get();
+            activity.setResult(RESULT_OK);
+            activity.finish();
         }
     }
 
