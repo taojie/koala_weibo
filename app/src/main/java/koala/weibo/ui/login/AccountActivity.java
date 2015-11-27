@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -31,22 +32,24 @@ import koala.weibo.support.database.AccountDBTask;
 import koala.weibo.ui.main.MainTimeLineActivity;
 
 
-public class AccountActivity extends Activity implements LoaderManager.LoaderCallbacks<List<AccountBean>>{
+public class AccountActivity extends AbstractAppActivity implements LoaderManager.LoaderCallbacks<List<AccountBean>> {
     public static final int ADD_ACCOUNT_REQUEST_CODE = 1;
     public static final int LOAD_ID = 0;
     public ListView listView;
     public AccountAdapter listAdapter;
     private List<AccountBean> accountList = new ArrayList<AccountBean>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getActionBar().setTitle(getString(R.string.app_name));
         listView = (ListView) findViewById(R.id.account_list);
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listAdapter = new AccountAdapter();
         listView.setOnItemClickListener(new AccountItemClickListener());
         listView.setAdapter(listAdapter);
-        getLoaderManager().initLoader(LOAD_ID,null,this);
+        getLoaderManager().initLoader(LOAD_ID, null, this);
     }
 
     @Override
@@ -61,7 +64,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.add_account_menu:
                 showAddAccountDialog();
         }
@@ -69,7 +72,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         return super.onOptionsItemSelected(item);
     }
 
-    public void showAddAccountDialog(){
+    public void showAddAccountDialog() {
         final ArrayList<Class> activityList = new ArrayList<Class>();
         ArrayList<String> itemListName = new ArrayList<String>();
         activityList.add(OauthActivity.class);
@@ -78,43 +81,44 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent();
-                intent.setClass(AccountActivity.this,activityList.get(which));
-                startActivityForResult(intent,ADD_ACCOUNT_REQUEST_CODE);
+                intent.setClass(AccountActivity.this, activityList.get(which));
+                startActivityForResult(intent, ADD_ACCOUNT_REQUEST_CODE);
             }
         }).show();
     }
 
     @Override
     public Loader<List<AccountBean>> onCreateLoader(int id, Bundle args) {
-        Log.e("koala","create loader=====");
+        Log.e("koala", "create loader=====");
         return new AccountDBLoader(AccountActivity.this);
     }
 
     @Override
     public void onLoadFinished(Loader<List<AccountBean>> loader, List<AccountBean> data) {
-        Log.e("koala","loader finished=====");
-         accountList = data;
-        Log.e("koala",accountList.size() + "");
-         listAdapter.notifyDataSetChanged();
+        Log.e("koala", "loader finished=====");
+        accountList = data;
+        Log.e("koala", accountList.size() + "");
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onLoaderReset(Loader<List<AccountBean>> loader) {
-
+        accountList = new ArrayList<>();
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == ADD_ACCOUNT_REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == ADD_ACCOUNT_REQUEST_CODE && resultCode == RESULT_OK) {
             refresh();
         }
     }
 
-    public void refresh(){
+    public void refresh() {
         getLoaderManager().getLoader(LOAD_ID).forceLoad();
     }
 
-    private static class AccountDBLoader extends AsyncTaskLoader<List<AccountBean>>{
+    private static class AccountDBLoader extends AsyncTaskLoader<List<AccountBean>> {
 
         public AccountDBLoader(Context context) {
             super(context);
@@ -132,14 +136,15 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         }
     }
 
-    private class AccountAdapter extends BaseAdapter{
+    private class AccountAdapter extends BaseAdapter {
         private int defaultBG;
         private int selectedBG;
 
-        public AccountAdapter(){
+        public AccountAdapter() {
             defaultBG = getResources().getColor(R.color.transparent);
             selectedBG = Color.BLUE;
         }
+
         @Override
         public int getCount() {
             return accountList.size();
@@ -158,38 +163,41 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             ViewHolder holder = new ViewHolder();
-            if(view == null  || view.getTag() == null){
+            if (view == null || view.getTag() == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                view = inflater.inflate(R.layout.account_list_item_layout,parent,false);
+                view = inflater.inflate(R.layout.account_list_item_layout, parent, false);
                 holder = new ViewHolder();
+                holder.root = findViewById(R.id.account_listview_root);
                 holder.avatar = (ImageView) view.findViewById(R.id.accout_image_avatar);
                 holder.account_name = (TextView) view.findViewById(R.id.account_name);
 
                 view.setTag(holder);
-            }else{
+            } else {
                 holder = (ViewHolder) view.getTag();
             }
-            view.setBackgroundColor(defaultBG);
-            if(listView.getCheckedItemPositions().get(position)){
-                view.setBackgroundColor(selectedBG);
+            holder.root.setBackgroundColor(defaultBG);
+            if (listView.getCheckedItemPositions().get(position)) {
+                holder.root.setBackgroundColor(selectedBG);
             }
             holder.account_name.setText(accountList.get(position).getUserBean().getScreen_name());
             //获取账户头像
-
+            geBitmapDownloader().downloadAvatar(holder.avatar, accountList.get(position).getUserBean(),false);
             return view;
         }
     }
-  //  static class
-    class ViewHolder{
-      ImageView avatar;
-      TextView account_name;
-  }
 
-    private class AccountItemClickListener implements AdapterView.OnItemClickListener{
+    //  static class
+    class ViewHolder {
+        View root;
+        ImageView avatar;
+        TextView account_name;
+    }
+
+    private class AccountItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent=   MainTimeLineActivity.newIntent(accountList.get(position));
+            Intent intent = MainTimeLineActivity.newIntent(accountList.get(position));
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
