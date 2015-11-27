@@ -27,6 +27,10 @@
             android:name=".ui.main.MainTimeLineActivity"
             android:label="@string/title_activity_main_time_line" >
         </activity>
+        <activity
+            android:name=".ui.login.AbstractAppActivity"
+            android:label="@string/title_activity_abstract_app" >
+        </activity>
     </application>
 
 </manifest>

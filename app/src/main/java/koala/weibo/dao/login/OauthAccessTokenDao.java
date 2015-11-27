@@ -63,7 +63,6 @@ public class OauthAccessTokenDao {
 
     public AccountBean getUserInfo(Map<String, String> param,AccountBean account) {
         String jsonData = HttpUtility.getInstance().executeNormalTask(URLHepler.GET_USER_INFO, HttpMethod.Get, param);
-        Log.e("koala","last=====" + jsonData);
         Gson gson = new Gson();
         UserBean user;
         user = gson.fromJson(jsonData, UserBean.class);

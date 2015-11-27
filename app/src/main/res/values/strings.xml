@@ -8,5 +8,6 @@
     <string name="action_settings">Settings</string>
     <string name="oauth_refresh">刷新</string>
     <string name="title_activity_main_time_line">MainTimeLineActivity</string>
+    <string name="title_activity_abstract_app">AbstractAppActivity</string>
 
 </resources>
